@@ -13,8 +13,9 @@ app = Flask(__name__)
 
 # Logging for debug purposes
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
+# Set up logging with desired level and format
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
 # Function to initialize and configure the TTS engine
