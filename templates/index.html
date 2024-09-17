@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Language Recognition</title>
     <style>
@@ -26,17 +25,20 @@
         .button:hover {
             background-color: #0056b3;
         }
-        #videoFeed {
+        #videoElement {
             border: 1px solid black;
             margin-top: 20px;
+            width: 640px;
+            height: 480px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Sign Language Recognition System</h1>
+        
         <!-- Video feed from the webcam -->
-        <img id="videoFeed" src="{{ url_for('video_feed') }}" alt="Video Feed">
+        <video id="videoElement" autoplay playsinline></video>
 
         <!-- Buttons for various actions -->
         <div>
@@ -47,8 +49,27 @@
         </div>
     </div>
 
-    <!-- JavaScript to handle button actions -->
+    <!-- JavaScript to access camera and handle button actions -->
     <script>
+        // Access the user's webcam using getUserMedia
+        const videoElement = document.getElementById('videoElement');
+
+        // Check if browser supports mediaDevices
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                // Set the video element's source to the stream from the user's camera
+                videoElement.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("Error accessing the camera: ", err);
+                alert("Unable to access the camera. Please check your permissions or try a different browser.");
+            });
+        } else {
+            alert("getUserMedia not supported by this browser.");
+        }
+
+        // Function to clear sentence
         function clearSentence() {
             fetch('/clear_sentence', {
                 method: 'POST'
@@ -59,6 +80,7 @@
             }).catch(error => console.error('Error:', error));
         }
 
+        // Function to save text
         function saveText() {
             fetch('/save_text', {
                 method: 'POST'
@@ -69,6 +91,7 @@
             }).catch(error => console.error('Error:', error));
         }
 
+        // Function to save PDF
         function savePDF() {
             fetch('/save_pdf', {
                 method: 'POST'
@@ -79,12 +102,13 @@
             }).catch(error => console.error('Error:', error));
         }
 
+        // Function to speak sentence
         function speakSentence() {
             fetch('/speak', {
                 method: 'POST'
             }).then(response => response.json()).then(data => {
                 if (data.success) {
-                   
+                    console.log("Speaking sentence...");
                 }
             }).catch(error => console.error('Error:', error));
         }
